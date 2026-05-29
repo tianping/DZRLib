@@ -1,0 +1,14 @@
+Package: DZRLib
+Title: A Collection Of R Helper Functions Used In My Bioinformatics Data Analysis
+Version: 0.0.0.9000
+Authors@R: 
+    person("Dejian", "Zhao", , "dejian.zhao@yale.edu", role = c("aut", "cre"))
+Description: Helper functions for Seurat, DESeq2 etc. To simplify the code for the data analysis
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+Imports: 
+    dplyr,
+    ggplot2,
+    Seurat
