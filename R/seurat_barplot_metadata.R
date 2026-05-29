@@ -25,16 +25,16 @@ seurat_barplot_metadata <- function(seurat_obj, x_var, fill_var, save_path = "ce
     stop(paste("错误: 列名", fill_var, "不存在于 seurat_obj@meta.data 中！"))
   }
 
-  # 2. 提取元数据并过滤掉 NA 值
+  # 2. 提取元数据并过滤掉 NA 值 (显式指定 dplyr::filter)
   meta_data <- seurat_obj@meta.data %>%
-    filter(!is.na(.data[[x_var]]), !is.na(.data[[fill_var]]))
+    dplyr::filter(!is.na(.data[[x_var]]), !is.na(.data[[fill_var]]))
   
-  # 3. 统计每种组合的细胞数目 (.data[[var]] 用于动态读取字符串列名)
+  # 3. 统计每种组合的细胞数目 (全部显式指定 dplyr::)
   count_data <- meta_data %>%
-    group_by(.data[[x_var]], .data[[fill_var]]) %>%
-    tally(name = "Cell_Count") %>%
-    ungroup()
-  
+    dplyr::group_by(.data[[x_var]], .data[[fill_var]]) %>%
+    dplyr::tally(name = "Cell_Count") %>%
+    dplyr::ungroup()
+
   # 计算总共有多少个不重复的 X 轴类别，用来动态调整图片宽度
   num_x_groups <- length(unique(count_data[[x_var]]))
   
