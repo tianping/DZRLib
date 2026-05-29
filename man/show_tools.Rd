@@ -2,10 +2,10 @@
 % Please edit documentation in R/show_tools.R
 \name{show_tools}
 \alias{show_tools}
-\title{打印 myRToolkit 工具箱的函数分类清单}
+\title{打印 DZRLib 工具箱的函数分类清单}
 \usage{
 show_tools()
 }
 \description{
-打印 myRToolkit 工具箱的函数分类清单
+打印 DZRLib 工具箱的函数分类清单
 }

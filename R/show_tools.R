@@ -1,11 +1,11 @@
-#' 打印 myRToolkit 工具箱的函数分类清单
+#' 打印 DZRLib 工具箱的函数分类清单
 #'
 #' @export
 show_tools <- function() {
-  all_funcs <- ls("package:myRToolkit")
+  all_funcs <- ls("package:DZRLib")
   
   cat("==================================================\n")
-  cat("       🛠️  myRToolkit 专属生信工具箱清单 🛠️       \n")
+  cat("       🛠️  DZRLib 专属生信工具箱清单 🛠️       \n")
   cat("==================================================\n\n")
   
   # 找出不同前缀的函数
