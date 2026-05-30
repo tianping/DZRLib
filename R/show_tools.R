@@ -1,25 +1,31 @@
-#' 打印 DZRLib 工具箱的函数分类清单
+#' Print a Categorized List of Available Functions in DZRLib
 #'
 #' @export
 show_tools <- function() {
   all_funcs <- ls("package:DZRLib")
   
+  # Robust filtering: only keep custom functions containing an underscore
+  # This perfectly excludes R system builtins (e.g., system.file, library.dynam)
+  user_funcs <- all_funcs[grep("_", all_funcs)]
+  
   cat("==================================================\n")
-  cat("       🛠️  DZRLib 专属生信工具箱清单 🛠️       \n")
-  cat("==================================================\n\n")
+  cat("         🛠️  DZRLib Bioinformatics Toolkit  🛠️       \n")
+  cat("==================================================\n")
+  cat("Only functions with _ in their names are shown\n\n")
   
-  # 找出不同前缀的函数
-  seurat_f <- all_funcs[grep("^seurat_", all_funcs)]
-  deseq2_f <- all_funcs[grep("^deseq2_", all_funcs)]
-  other_f  <- all_funcs[!all_funcs %in% c(seurat_f, deseq2_f, "show_tools")]
+  # Group functions by their prefixes
+  seurat_f <- user_funcs[grep("^seurat_", user_funcs)]
+  deseq2_f <- user_funcs[grep("^deseq2_", user_funcs)]
+  other_f  <- user_funcs[!user_funcs %in% c(seurat_f, deseq2_f)]
   
-  cat("[Seurat helper functions]:\n")
-  if(length(seurat_f) > 0) cat(paste("  -", seurat_f, collapse = "\n"), "\n") else cat("  (暂无)\n")
+  cat("[Seurat Helper Functions]:\n")
+  if(length(seurat_f) > 0) cat(paste("  -", seurat_f, collapse = "\n"), "\n") else cat("  (None)\n")
   
-  cat("\n[Deseq2 helper functions]:\n")
-  if(length(deseq2_f) > 0) cat(paste("  -", deseq2_f, collapse = "\n"), "\n") else cat("  (暂无)\n")
+  cat("\n[DESeq2 Helper Functions]:\n")
+  if(length(deseq2_f) > 0) cat(paste("  -", deseq2_f, collapse = "\n"), "\n") else cat("  (None)\n")
   
-  cat("\n[其他通用工具]:\n")
-  if(length(other_f) > 0) cat(paste("  -", other_f, collapse = "\n"), "\n") else cat("  (暂无)\n")
+  cat("\n[General Utilities]:\n")
+  if(length(other_f) > 0) cat(paste("  -", other_f, collapse = "\n"), "\n") else cat("  (None)\n")
   cat("==================================================\n")
 }
+

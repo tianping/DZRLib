@@ -3,7 +3,7 @@ Title: A Collection Of R Helper Functions Used In My Bioinformatics Data Analysi
 Version: 0.0.0.9000
 Authors@R: 
     person("Dejian", "Zhao", , "dejian.zhao@yale.edu", role = c("aut", "cre"))
-Description: Helper functions for Seurat, DESeq2 etc. To simplify the code for the data analysis
+Description: Helper functions for Seurat, DESeq2 etc. To simplify the code for the data analysis. [Use the understore in the R functions]
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

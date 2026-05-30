@@ -2,7 +2,7 @@
 % Please edit documentation in R/seurat_barplot_metadata.R
 \name{seurat_barplot_metadata}
 \alias{seurat_barplot_metadata}
-\title{动态绘制 Seurat 对象元数据两列组合的细胞数目柱状图}
+\title{Plot Dynamic Cell Count Barplots for Two Combined Metadata Variables in a Seurat Object}
 \usage{
 seurat_barplot_metadata(
   seurat_obj,
@@ -12,19 +12,19 @@ seurat_barplot_metadata(
 )
 }
 \arguments{
-\item{seurat_obj}{一个标准的 Seurat 对象。}
+\item{seurat_obj}{A standard Seurat object.}
 
-\item{x_var}{字符串，指定作为横轴 (X轴) 的 meta.data 列名（如 "predicted.cell_subclass"）。}
+\item{x_var}{Character string specifying the metadata column name to use as the X-axis (e.g., "predicted.cell_subclass").}
 
-\item{fill_var}{字符串，指定作为柱状图拆分/颜色填充的 meta.data 列名（如 "Condition"）。}
+\item{fill_var}{Character string specifying the metadata column name to use for bar splitting and fill color (e.g., "Condition").}
 
-\item{save_path}{字符串，图片保存的路径和文件名，默认为 "cell_counts_barplot.png"。}
+\item{save_path}{Character string specifying the output path and file name for the plot. Defaults to "cell_counts_barplot.png".}
 }
 \value{
-返回一个 ggplot2 对象，并在指定路径保存一张高质量 PNG 图片。
+Returns a ggplot2 object and saves a high-resolution PNG image to the specified path.
 }
 \description{
-动态绘制 Seurat 对象元数据两列组合的细胞数目柱状图
+Plot Dynamic Cell Count Barplots for Two Combined Metadata Variables in a Seurat Object
 }
 \examples{
 # seurat_barplot_metadata(merged, x_var = "predicted.cell_subclass", fill_var = "Condition")

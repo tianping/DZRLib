@@ -2,14 +2,14 @@ library(Seurat)
 library(ggplot2)
 library(dplyr)
 
-#' 动态绘制 Seurat 对象元数据两列组合的细胞数目柱状图
+#' Plot Dynamic Cell Count Barplots for Two Combined Metadata Variables in a Seurat Object
 #'
-#' @param seurat_obj 一个标准的 Seurat 对象。
-#' @param x_var 字符串，指定作为横轴 (X轴) 的 meta.data 列名（如 "predicted.cell_subclass"）。
-#' @param fill_var 字符串，指定作为柱状图拆分/颜色填充的 meta.data 列名（如 "Condition"）。
-#' @param save_path 字符串，图片保存的路径和文件名，默认为 "cell_counts_barplot.png"。
+#' @param seurat_obj A standard Seurat object.
+#' @param x_var Character string specifying the metadata column name to use as the X-axis (e.g., "predicted.cell_subclass").
+#' @param fill_var Character string specifying the metadata column name to use for bar splitting and fill color (e.g., "Condition").
+#' @param save_path Character string specifying the output path and file name for the plot. Defaults to "cell_counts_barplot.png".
 #'
-#' @return 返回一个 ggplot2 对象，并在指定路径保存一张高质量 PNG 图片。
+#' @return Returns a ggplot2 object and saves a high-resolution PNG image to the specified path.
 #' @export
 #'
 #' @examples
@@ -17,35 +17,35 @@ library(dplyr)
 #' # seurat_barplot_metadata(merged, x_var = "Phase", fill_var = "Stage", save_path = "phase_by_stage.png")
 seurat_barplot_metadata <- function(seurat_obj, x_var, fill_var, save_path = "cell_counts_barplot.png") {
   
-  # 1. 检查输入的列名是否存在于元数据中
+  # 1. Verify if the specified variables exist in the metadata
   if (!x_var %in% colnames(seurat_obj@meta.data)) {
-    stop(paste("错误: 列名", x_var, "不存在于 seurat_obj@meta.data 中！"))
+    stop(paste("Error: Column name '", x_var, "' not found in seurat_obj@meta.data!"))
   }
   if (!fill_var %in% colnames(seurat_obj@meta.data)) {
-    stop(paste("错误: 列名", fill_var, "不存在于 seurat_obj@meta.data 中！"))
+    stop(paste("Error: Column name '", fill_var, "' not found in seurat_obj@meta.data!"))
   }
 
-  # 2. 提取元数据并过滤掉 NA 值 (显式指定 dplyr::filter)
+  # 2. Extract metadata and filter out NA values
   meta_data <- seurat_obj@meta.data %>%
     dplyr::filter(!is.na(.data[[x_var]]), !is.na(.data[[fill_var]]))
   
-  # 3. 统计每种组合的细胞数目 (全部显式指定 dplyr::)
+  # 3. Calculate cell count for each group combination
   count_data <- meta_data %>%
     dplyr::group_by(.data[[x_var]], .data[[fill_var]]) %>%
     dplyr::tally(name = "Cell_Count") %>%
     dplyr::ungroup()
 
-  # 计算总共有多少个不重复的 X 轴类别，用来动态调整图片宽度
+  # Count unique categories along X-axis to dynamically scale the plot width
   num_x_groups <- length(unique(count_data[[x_var]]))
   
-  # 4. 动态计算图表的长宽 (单位：英寸)
-  dynamic_width <- max(6, 4 + (num_x_groups * 1.2)) # 确保最少有 6 英寸宽
+  # 4. Dynamically compute dimensions (in inches)
+  dynamic_width <- max(6, 4 + (num_x_groups * 1.2)) # Ensure a minimum width of 6 inches
   dynamic_height <- 7
   
-  # 5. 使用 ggplot2 绘图
+  # 5. Generate plot using ggplot2
   p <- ggplot(count_data, aes(x = .data[[x_var]], y = Cell_Count, fill = .data[[fill_var]])) +
     geom_bar(stat = "identity", position = position_dodge(0.8), width = 0.7) +
-    # 在柱子上方标出细胞数目
+    # Add text labels displaying cell counts above bars
     geom_text(
       aes(label = Cell_Count),
       position = position_dodge(0.8),
@@ -68,7 +68,7 @@ seurat_barplot_metadata <- function(seurat_obj, x_var, fill_var, save_path = "ce
       legend.position = "top"
     )
   
-  # 6. 自动保存图片
+  # 6. Automatically save the plot
   message(paste0("Saving plot with dynamic width: ", round(dynamic_width, 2), " inches"))
   ggsave(
     filename = save_path, 
