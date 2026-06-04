@@ -2,4 +2,5 @@
 
 export(seurat_barplot_metadata)
 export(seurat_dotplot_markers)
+export(show_memory_usage)
 export(show_tools)
