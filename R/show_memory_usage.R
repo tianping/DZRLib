@@ -23,22 +23,23 @@ show_memory_usage <- function() {
     gc_output_after <- gc()
 
     # Handle different R versions where gc() output structure may vary
-    if ("Vcells" %in% names(gc_output)) {
-      total_allocated <- gc_output[["Vcells"]] * object.size(1)
-      vectors <- gc_output[["Vcells"]]
+    # Check if gc() returns a data frame (newer R) or matrix (older R)
+    if (is.data.frame(gc_output)) {
+      # Newer R version with data frame output
+      total_allocated <- gc_output$Ncells * object.size(1)
+      vectors <- gc_output$Ncells
+      total_in_use <- gc_output_after$Ncells * object.size(1)
+      objects <- gc_output_after$Ncells
+    } else if (is.matrix(gc_output)) {
+      # Older R version with matrix output
+      total_allocated <- gc_output[1,1] * object.size(1)
+      vectors <- gc_output[1,1]
+      total_in_use <- gc_output_after[1,1] * object.size(1)
+      objects <- gc_output_after[1,1]
     } else {
-      # Fallback for older R versions
-      total_allocated <- gc_output[["Ncells"]] * mean(sapply(gc_output[1:3], function(x) object.size(x)))
-      vectors <- gc_output[["Ncells"]]
+      # Fallback for unexpected output
+      stop("Unexpected gc() output format")
     }
-
-    if ("Vcells" %in% names(gc_output_after)) {
-      total_in_use <- gc_output_after[["Vcells"]] * object.size(1)
-    } else {
-      total_in_use <- gc_output_after[["Ncells"]] * mean(sapply(gc_output_after[1:3], function(x) object.size(x)))
-    }
-
-    objects <- gc_output_after[["Ncells"]]
 
     # Try memory.limit() but handle cases where it's not available
     max_memory <- tryCatch({
