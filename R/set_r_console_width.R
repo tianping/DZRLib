@@ -1,3 +1,21 @@
+#' Set R Console Width
+#'
+#' This function sets the R console width. If a width is provided, it uses that value.
+#' If no width is provided, it attempts to detect the console width using system tools
+#' and sets the console width accordingly.
+#'
+#' @param width Numeric value specifying the console width in characters. If NULL (default),
+#'              the function will attempt to detect the console width automatically.
+#'
+#' @return Returns the console width that was set, invisibly.
+#' @export
+#'
+#' @examples
+#' # Set console width to 100 characters
+#' set_r_console_width(100)
+#'
+#' # Auto-detect console width
+#' set_r_console_width()
 set_r_console_width <- function(width = NULL) {
   # If width is provided, use it; otherwise detect console width
   if (!is.null(width)) {
