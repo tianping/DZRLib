@@ -20,3 +20,8 @@ set_r_console_width <- function(width = NULL) {
   options(width = console_width)
   invisible(console_width)
 }
+
+# Export the function to make it visible after loading the package
+if (getRversion() >= "2.14.0") {
+  utils::globalVariables(c("set_r_console_width"))
+}
