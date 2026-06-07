@@ -8,7 +8,7 @@ set_r_console_width(width = NULL)
 }
 \arguments{
 \item{width}{Numeric value specifying the console width in characters. If NULL (default),
-the function will attempt to detect the console width automatically.}
+              the function will attempt to detect the console width automatically.}
 }
 \value{
 Returns the console width that was set, invisibly.
