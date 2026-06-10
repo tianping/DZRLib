@@ -10,10 +10,10 @@ seurat_save_metadata(seurat_obj, columns = NULL, filename = NULL)
 \item{seurat_obj}{A standard Seurat object.}
 
 \item{columns}{Optional character vector of column names to save. If NULL (default),
-all columns from the metadata will be saved.}
+                all columns from the metadata will be saved.}
 
 \item{filename}{Character string specifying the output file path. Defaults to
-"\link{seurat-object-name}.metadata.tsv".}
+                 "[seurat-object-name].metadata.tsv".}
 }
 \value{
 Returns the path to the saved file, invisibly.

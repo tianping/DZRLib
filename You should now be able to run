@@ -1,0 +1,3 @@
+git add R/seurat_save_metadata.R man/seurat_save_metadata.Rd
+git commit -m "Update seurat_save_metadata to include cell.id header column"
+git push
