@@ -7,6 +7,7 @@
 seurat_dimplot(
   seurat_obj,
   reduction = "umap",
+  ident = NULL,
   output_dir = "./",
   output_file = "DimPlot",
   width = 8,
@@ -19,6 +20,9 @@ seurat_dimplot(
 
 \item{reduction}{Character string specifying the dimensionality reduction to use (e.g., "pca", "umap", "tsne").
 Default is "umap".}
+
+\item{ident}{Optional character string specifying the metadata column to set as the active identity.
+If provided, the function will set Idents(seurat_obj) to this value and include it in the filename.}
 
 \item{output_dir}{Directory path where the plot will be saved. Default is current directory ("./").}
 
@@ -35,7 +39,7 @@ Invisibly returns the path to the saved plot file.
 }
 \description{
 This function creates a dimensionality reduction plot (DimPlot) for a Seurat object
-and saves it as a PDF file. It accepts all standard DimPlot parameters and allows
+and saves it as a file. It accepts all standard DimPlot parameters and allows
 customization of the output file path, dimensions, and other plotting parameters.
 }
 \examples{
@@ -44,6 +48,9 @@ seurat_dimplot(my.seurat)
 
 # With custom reduction and output file
 seurat_dimplot(my.seurat, reduction = "pca", output_file = "pca_plot")
+
+# With identity parameter (includes in filename)
+seurat_dimplot(my.seurat, ident = "cell.type", output_file = "dimplot_by_celltype")
 
 # With additional DimPlot parameters
 seurat_dimplot(my.seurat, group.by = "cell.type", label = TRUE, pt.size = 0.5)
