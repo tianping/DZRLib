@@ -3,6 +3,7 @@
 export(get_cell_type_colors)
 export(set_r_console_width)
 export(seurat_barplot_metadata)
+export(seurat_dimplot)
 export(seurat_dotplot_markers)
 export(seurat_heatmap_features)
 export(seurat_qc_plots_features)
