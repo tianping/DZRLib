@@ -47,7 +47,7 @@ seurat_save_metadata <- function(seurat_obj, columns = NULL, filename = NULL) {
     filename <- paste0(clean_name, ".metadata.tsv")
   }
 
-  # Save to TSV file
+  # Save to TSV file with proper column names
   write.table(meta_data, file = filename, sep = "\t", row.names = TRUE,
               quote = FALSE, col.names = TRUE)
 
