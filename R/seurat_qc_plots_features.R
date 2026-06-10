@@ -120,4 +120,3 @@ seurat_qc_plots_features <- function(seurat_obj,
                                                                                                                                                          
   invisible(output_paths)                                                                                                                                
 }                                                                                                                                                        
-
