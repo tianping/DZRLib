@@ -96,7 +96,9 @@ seurat_qc_plots_features <- function(seurat_obj,
   if (!is.null(ident_var)) {                                                                                                                             
     dotplot_params$ident_var <- ident_var                                                                                                                
   }                                                                                                                                                      
-  output_paths$dotplot <- seurat_dotplot_features(seurat_obj,                                                                                            
+
+  #output_paths$dotplot <- seurat_dotplot_features(seurat_obj,                                                                                            
+  output_paths$dotplot <- seurat_dotplot_markers(seurat_obj,                                                                                            
                                                  all_features,                                                                                           
                                                  output_dir,                                                                                             
                                                  output_file = dotplot_file,                                                                             
