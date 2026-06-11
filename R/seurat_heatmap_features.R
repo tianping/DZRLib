@@ -69,4 +69,3 @@ seurat_heatmap_features <- function(seurat_obj,
                                                                                                                                                          
   invisible(output_path)                                                                                                                                 
 }                                                                                                                                                        
-

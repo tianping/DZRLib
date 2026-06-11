@@ -12,6 +12,7 @@
 #' @param featureplot_params List of parameters to pass to FeaturePlot function.                                                                         
 #' @param width Numeric value for plot width. Default is 7.                                                                                              
 #' @param height Numeric value for plot height. Default is 7.                                                                                            
+#' @param ... Additional arguments to pass to both VlnPlot and FeaturePlot functions.                                                                     
 #'                                                                                                                                                       
 #' @return Invisibly returns a list of paths to the saved plot files.                                                                                    
 #' @export                                                                                                                                               
@@ -33,7 +34,8 @@ seurat_violin_feature_plots <- function(seurat_obj,
                                        vlnplot_params = list(),                                                                                          
                                        featureplot_params = list(),                                                                                      
                                        width = 7,                                                                                                        
-                                       height = 7) {                                                                                                     
+                                       height = 7,                                                                                                        
+                                       ...) {                                                                                                     
   # Input validation                                                                                                                                     
   if (!inherits(seurat_obj, "Seurat")) {                                                                                                                 
     stop("seurat_obj must be a Seurat object")                                                                                                           
@@ -59,13 +61,13 @@ seurat_violin_feature_plots <- function(seurat_obj,
                                                                                                                                                          
   for (gene in usersMarkers) {                                                                                                                           
     # Create and save VlnPlot                                                                                                                            
-    vln_plot <- do.call(VlnPlot, c(list(seurat_obj, features = gene), vlnplot_params))                                                                   
+    vln_plot <- do.call(VlnPlot, c(list(seurat_obj, features = gene), vlnplot_params, list(...)))                                                                   
     vln_path <- file.path(output_dir, paste0(vlnplot_prefix, gene, ".VlnPlot.pdf"))                                                                      
     ggplot2::ggsave(vln_path, width = width, height = height)                                                                                                     
     output_paths$vlnplot <- c(output_paths$vlnplot, vln_path)                                                                                            
                                                                                                                                                          
     # Create and save FeaturePlot                                                                                                                        
-    feat_plot <- do.call(FeaturePlot, c(list(seurat_obj, features = gene, order = TRUE), featureplot_params))                                                          
+    feat_plot <- do.call(FeaturePlot, c(list(seurat_obj, features = gene, order = TRUE), featureplot_params, list(...)))                                                          
     feat_path <- file.path(output_dir, paste0(featureplot_prefix, gene, ".FeaturePlot.pdf"))                                                             
     ggplot2::ggsave(feat_path, width = width, height = height)                                                                                                    
     output_paths$featureplot <- c(output_paths$featureplot, feat_path)                                                                                   
@@ -73,4 +75,3 @@ seurat_violin_feature_plots <- function(seurat_obj,
                                                                                                                                                          
   invisible(output_paths)                                                                                                                                
 }                                                                                                                                                        
-
