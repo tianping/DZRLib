@@ -70,7 +70,7 @@ seurat_barplot_metadata <- function(seurat_obj, x_var, fill_var, save_path = "ce
 
   # 6. Automatically save the plot
   message(paste0("Saving plot with dynamic width: ", round(dynamic_width, 2), " inches"))
-  ggsave(
+  ggplot2::ggsave(
     filename = save_path,
     plot = p,
     width = dynamic_width,
