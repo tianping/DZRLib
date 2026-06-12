@@ -13,7 +13,9 @@ seurat_violin_feature_plots(
   vlnplot_params = list(),
   featureplot_params = list(),
   width = 7,
-  height = 7
+  height = 7,
+  ident = NULL,
+  ...
 )
 }
 \arguments{
@@ -34,6 +36,11 @@ seurat_violin_feature_plots(
 \item{width}{Numeric value for plot width. Default is 7.}
 
 \item{height}{Numeric value for plot height. Default is 7.}
+
+\item{ident}{Optional character string specifying the metadata column to set as the active identity.
+If provided, the function will set Idents(seurat_obj) to this value and include it in the filename.}
+
+\item{...}{Additional arguments to pass to both VlnPlot and FeaturePlot functions.}
 }
 \value{
 Invisibly returns a list of paths to the saved plot files.
@@ -52,4 +59,6 @@ seurat_violin_feature_plots(my.seurat, features = my_genes,
                            vlnplot_prefix = "vln_",                                                                                                   
                            featureplot_prefix = "feat_")                                                                                              
                                                                                                                                                       
+# With identity parameter (includes in filename)
+seurat_violin_feature_plots(my.seurat, features = c("PECAM1", "CDH5"), ident = "cell.type")
 }
