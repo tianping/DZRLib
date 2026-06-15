@@ -7,7 +7,7 @@
 seurat_barplot_metadata(
   seurat_obj,
   x_var,
-  fill_var,
+  fill_var = NULL,
   save_path = "cell_counts_barplot.png"
 )
 }
@@ -16,7 +16,7 @@ seurat_barplot_metadata(
 
 \item{x_var}{Character string specifying the metadata column name to use as the X-axis (e.g., "predicted.cell_subclass").}
 
-\item{fill_var}{Character string specifying the metadata column name to use for bar splitting and fill color (e.g., "Condition").}
+\item{fill_var}{Character string specifying the metadata column name to use for bar splitting and fill color (e.g., "Condition"). Defaults to NULL, which will use the current active identity.}
 
 \item{save_path}{Character string specifying the output path and file name for the plot. Defaults to "cell_counts_barplot.png".}
 }
@@ -29,4 +29,5 @@ Plot Dynamic Cell Count Barplots for Two Combined Metadata Variables in a Seurat
 \examples{
 # seurat_barplot_metadata(merged, x_var = "predicted.cell_subclass", fill_var = "Condition")
 # seurat_barplot_metadata(merged, x_var = "Phase", fill_var = "Stage", save_path = "phase_by_stage.png")
+# seurat_barplot_metadata(merged, x_var = "predicted.cell_subclass") # Uses active identity for fill
 }

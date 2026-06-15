@@ -6,7 +6,7 @@ library(dplyr)
 #'
 #' @param seurat_obj A standard Seurat object.
 #' @param x_var Character string specifying the metadata column name to use as the X-axis (e.g., "predicted.cell_subclass").
-#' @param fill_var Character string specifying the metadata column name to use for bar splitting and fill color (e.g., "Condition").
+#' @param fill_var Character string specifying the metadata column name to use for bar splitting and fill color (e.g., "Condition"). Defaults to NULL, which will use the current active identity.
 #' @param save_path Character string specifying the output path and file name for the plot. Defaults to "cell_counts_barplot.png".
 #'
 #' @return Returns a ggplot2 object and saves a high-resolution PNG image to the specified path.
@@ -15,13 +15,21 @@ library(dplyr)
 #' @examples
 #' # seurat_barplot_metadata(merged, x_var = "predicted.cell_subclass", fill_var = "Condition")
 #' # seurat_barplot_metadata(merged, x_var = "Phase", fill_var = "Stage", save_path = "phase_by_stage.png")
-seurat_barplot_metadata <- function(seurat_obj, x_var, fill_var, save_path = "cell_counts_barplot.png") {
+#' # seurat_barplot_metadata(merged, x_var = "predicted.cell_subclass") # Uses active identity for fill
+seurat_barplot_metadata <- function(seurat_obj, x_var, fill_var = NULL, save_path = "cell_counts_barplot.png") {
 
   # 1. Verify if the specified variables exist in the metadata
   if (!x_var %in% colnames(seurat_obj@meta.data)) {
     stop(paste("Error: Column name '", x_var, "' not found in seurat_obj@meta.data!"))
   }
-  if (!fill_var %in% colnames(seurat_obj@meta.data)) {
+
+  # Use active identity if fill_var is not specified
+  if (is.null(fill_var)) {
+    fill_var <- Seurat::Idents(seurat_obj)
+    if (!fill_var %in% colnames(seurat_obj@meta.data)) {
+      stop(paste("Error: Active identity '", fill_var, "' not found in seurat_obj@meta.data!"))
+    }
+  } else if (!fill_var %in% colnames(seurat_obj@meta.data)) {
     stop(paste("Error: Column name '", fill_var, "' not found in seurat_obj@meta.data!"))
   }
 
