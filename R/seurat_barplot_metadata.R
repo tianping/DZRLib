@@ -25,11 +25,19 @@ seurat_barplot_metadata <- function(seurat_obj, x_var, fill_var = NULL, save_pat
 
   # Determine fill variable - use active identity if fill_var is NULL
   if (is.null(fill_var)) {
-    fill_var <- Seurat::Idents(seurat_obj)
-    if (length(fill_var) == 0 || !fill_var %in% colnames(seurat_obj@meta.data)) {
-      stop(paste("Error: Active identity '", fill_var, "' not found in seurat_obj@meta.data!"))
+    # Get the active identity as a character string
+    active_ident <- Seurat::Idents(seurat_obj)
+    # Convert to character string if it's a factor
+    if (is.factor(active_ident)) {
+      active_ident <- levels(active_ident)[as.integer(active_ident[1])]
+    } else {
+      active_ident <- as.character(active_ident[1])
     }
-  } else if (!fill_var %in% colnames(seurat_obj@meta.data)) {
+    fill_var <- active_ident
+  }
+
+  # Verify fill_var exists in metadata
+  if (!fill_var %in% colnames(seurat_obj@meta.data)) {
     stop(paste("Error: Column name '", fill_var, "' not found in seurat_obj@meta.data!"))
   }
 
