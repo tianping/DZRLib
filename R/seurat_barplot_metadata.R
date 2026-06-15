@@ -6,7 +6,7 @@ library(dplyr)
 #'
 #' @param seurat_obj A standard Seurat object.
 #' @param x_var Character string specifying the metadata column name to use as the X-axis (e.g., "predicted.cell_subclass").
-#' @param fill_var Character string specifying the metadata column name to use for bar splitting and fill color (e.g., "Condition"). Defaults to NULL, which will use the current active identity.
+#' @param fill_var Character string specifying the metadata column name to use for bar splitting and fill color (e.g., "Condition"). Defaults to NULL, which will use the current active identity. If NULL, the function will use the active identity from the Seurat object.
 #' @param save_path Character string specifying the output path and file name for the plot. Defaults to "cell_counts_barplot.png".
 #'
 #' @return Returns a ggplot2 object and saves a high-resolution PNG image to the specified path.

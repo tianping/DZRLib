@@ -16,7 +16,7 @@ seurat_barplot_metadata(
 
 \item{x_var}{Character string specifying the metadata column name to use as the X-axis (e.g., "predicted.cell_subclass").}
 
-\item{fill_var}{Character string specifying the metadata column name to use for bar splitting and fill color (e.g., "Condition"). Defaults to NULL, which will use the current active identity.}
+\item{fill_var}{Character string specifying the metadata column name to use for bar splitting and fill color (e.g., "Condition"). Defaults to NULL, which will use the current active identity. If NULL, the function will use the active identity from the Seurat object.}
 
 \item{save_path}{Character string specifying the output path and file name for the plot. Defaults to "cell_counts_barplot.png".}
 }
