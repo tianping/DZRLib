@@ -2,32 +2,68 @@
 % Please edit documentation in R/seurat_barplot_metadata.R
 \name{seurat_barplot_metadata}
 \alias{seurat_barplot_metadata}
-\title{Plot Dynamic Cell Count Barplots for Two Combined Metadata Variables in a Seurat Object}
+\title{Plot Cell Count Barplots for Metadata Variables in a Seurat Object}
 \usage{
 seurat_barplot_metadata(
   seurat_obj,
   x_var,
   fill_var = NULL,
-  save_path = "cell_counts_barplot.png"
+  save_path = "cell_counts_barplot.png",
+  width = 12,
+  height = 8,
+  dpi = 300,
+  angle = 45,
+  color_palette = NULL
 )
 }
 \arguments{
 \item{seurat_obj}{A standard Seurat object.}
 
-\item{x_var}{Character string specifying the metadata column name to use as the X-axis (e.g., "predicted.cell_subclass").}
+\item{x_var}{Character string specifying the metadata column name to set as active
+identity and use as the X-axis (e.g., "predicted.cell_subclass").}
 
-\item{fill_var}{Character string specifying the metadata column name to use for bar splitting and fill color (e.g., "Condition"). Defaults to NULL, which will use the current active identity. If NULL, the function will use the active identity from the Seurat object.}
+\item{fill_var}{Character string specifying the metadata column name to use for
+bar splitting and fill color (e.g., "Condition"). Defaults to NULL, which
+produces a simple barplot without splitting.}
 
-\item{save_path}{Character string specifying the output path and file name for the plot. Defaults to "cell_counts_barplot.png".}
+\item{save_path}{Character string specifying the output path and file name for
+the plot. Defaults to "cell_counts_barplot.png".}
+
+\item{width}{Numeric value specifying the width of the saved plot in inches.
+Defaults to 12.}
+
+\item{height}{Numeric value specifying the height of the saved plot in inches.
+Defaults to 8.}
+
+\item{dpi}{Integer value specifying the resolution of the saved plot. Defaults
+to 300.}
+
+\item{angle}{Numeric value specifying the angle of x-axis text labels. Defaults
+to 45.}
+
+\item{color_palette}{Optional character vector of colors to use for fill_var
+categories. If NULL, default ggplot2 colors are used.}
 }
 \value{
-Returns a ggplot2 object and saves a high-resolution PNG image to the specified path.
+Returns a ggplot2 object. The original Seurat object's active identity
+is restored after plotting (if it came from a metadata column).
 }
 \description{
-Plot Dynamic Cell Count Barplots for Two Combined Metadata Variables in a Seurat Object
+This function sets the active identity of a Seurat object to a specified metadata
+variable and generates a barplot showing cell counts. Optionally, it can split
+each bar by an additional metadata variable with dodged bars.
 }
 \examples{
-# seurat_barplot_metadata(merged, x_var = "predicted.cell_subclass", fill_var = "Condition")
-# seurat_barplot_metadata(merged, x_var = "Phase", fill_var = "Stage", save_path = "phase_by_stage.png")
-# seurat_barplot_metadata(merged, x_var = "predicted.cell_subclass") # Uses active identity for fill
+\dontrun{
+# Simple barplot with only x_var
+seurat_barplot_metadata(seurat_obj, x_var = "predicted.cell_subclass")
+
+# Barplot with fill_var for dodged bars
+seurat_barplot_metadata(seurat_obj, x_var = "predicted.cell_subclass",
+                        fill_var = "Condition")
+
+# Custom save path and appearance
+seurat_barplot_metadata(seurat_obj, x_var = "Phase", fill_var = "Stage",
+                        save_path = "phase_by_stage.png", width = 10, height = 6)
+}
 }

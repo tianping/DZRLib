@@ -1,7 +1,7 @@
 #' Find Which Metadata Column(s) Correspond to Current Active Identity
 #'
-#' This function compares the current active identity of a Seurat object with all 
-#' metadata columns to identify which column(s) have identical values to the 
+#' This function compares the current active identity of a Seurat object with all
+#' metadata columns to identify which column(s) have identical values to the
 #' current active identity.
 #'
 #' @param seurat_obj A Seurat object
@@ -25,26 +25,26 @@ seurat_get_active_ident_column <- function(seurat_obj) {
   if (!inherits(seurat_obj, "Seurat")) {
     stop("seurat_obj must be a Seurat object")
   }
-  
+
   # Get current active identity values
   current_idents <- Seurat::Idents(seurat_obj)
   current_idents_char <- as.character(current_idents)
-  
+
   # Get all metadata columns
   metadata <- seurat_obj[[]]
   metadata_cols <- colnames(metadata)
-  
+
   # Find all matching columns
   matching_cols <- c()
   for (col in metadata_cols) {
     # Convert metadata column to character for comparison
     col_values <- as.character(metadata[[col]])
-    
+
     # Check if the values (ordered by cell barcodes) match exactly
     if (identical(current_idents_char, col_values)) {
       matching_cols <- c(matching_cols, col)
     }
   }
-  
+
   return(matching_cols)
 }
