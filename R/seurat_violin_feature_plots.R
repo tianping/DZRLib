@@ -74,22 +74,24 @@ seurat_violin_feature_plots <- function(seurat_obj,
   for (gene in usersMarkers) {
     # Create and save VlnPlot
     vln_plot <- do.call(VlnPlot, c(list(seurat_obj, features = gene), vlnplot_params, list(...)))
+    vln_plot <- vln_plot & Seurat::NoLegend()
     vln_path <- file.path(output_dir, paste0(vlnplot_prefix, gene, ".VlnPlot.pdf"))
     if (!is.null(ident)) {
       vln_path <- tools::file_path_sans_ext(vln_path)
       vln_path <- paste0(vln_path, ".", ident, ".pdf")
     }
-    ggplot2::ggsave(vln_path, width = width, height = height)
+    ggplot2::ggsave(vln_path, plot = vln_plot, width = width, height = height)
     output_paths$vlnplot <- c(output_paths$vlnplot, vln_path)
 
     # Create and save FeaturePlot
     feat_plot <- do.call(FeaturePlot, c(list(seurat_obj, features = gene, order = TRUE), featureplot_params, list(...)))
+    feat_plot <- feat_plot & Seurat::NoLegend()
     feat_path <- file.path(output_dir, paste0(featureplot_prefix, gene, ".FeaturePlot.pdf"))
     if (!is.null(ident)) {
       feat_path <- tools::file_path_sans_ext(feat_path)
       feat_path <- paste0(feat_path, ".", ident, ".pdf")
     }
-    ggplot2::ggsave(feat_path, width = width, height = height)
+    ggplot2::ggsave(feat_path, plot = feat_plot, width = width, height = height)
     output_paths$featureplot <- c(output_paths$featureplot, feat_path)
   }
 
