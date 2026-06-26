@@ -24,16 +24,20 @@ subsets both objects to these common cells, and adds the ATAC assay to the Seura
 }
 \details{
 The function performs the following steps:
-1. Identifies common cells between RNA and ATAC datasets
-2. Subsets both objects to these common cells
-3. Verifies cell order alignment after subsetting
-4. Adds the ATAC assay to the Seurat object
-5. Sets the default assay back to "RNA"
+\enumerate{
+\item Identifies common cells between RNA and ATAC datasets
+\item Subsets both objects to these common cells
+\item Verifies cell order alignment after subsetting
+\item Adds the ATAC assay to the Seurat object
+\item Sets the default assay back to "RNA"
+}
 }
 \note{
-- The function requires that both RNA and ATAC objects have the same cell barcodes
-- Cell order must be consistent between the two datasets
-- The RNA assay is set as the default assay after adding the ATAC assay
+\itemize{
+\item The function requires that both RNA and ATAC objects have the same cell barcodes
+\item Cell order must be consistent between the two datasets
+\item The RNA assay is set as the default assay after adding the ATAC assay
+}
 }
 \examples{
 # Basic usage
@@ -42,6 +46,7 @@ updated_seurat <- add_ATAC_assay(rna_seurat, atac_data)
 
 # With custom assay name
 updated_seurat <- add_ATAC_assay(rna_seurat, atac_data, assay_name = "ATAC_peaks")
+
 }
 \seealso{
 \code{\link{DefaultAssay}} for managing default assays in Seurat objects

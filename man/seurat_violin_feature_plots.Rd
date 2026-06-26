@@ -50,15 +50,14 @@ Creates violin plots and feature plots for individual genes in a Seurat object.
 Each gene gets its own pair of plots saved to the specified output directory.
 }
 \examples{
-                                                                                                                                            
-# Basic usage                                                                                                                                         
-seurat_violin_feature_plots(my.seurat, features = c("PECAM1", "CDH5"))                                                                                
-                                                                                                                                                      
-# With custom prefixes                                                                                                                                
-seurat_violin_feature_plots(my.seurat, features = my_genes,                                                                                           
-                           vlnplot_prefix = "vln_",                                                                                                   
-                           featureplot_prefix = "feat_")                                                                                              
-                                                                                                                                                      
+# Basic usage
+seurat_violin_feature_plots(my.seurat, features = c("PECAM1", "CDH5"))
+
+# With custom prefixes
+seurat_violin_feature_plots(my.seurat, features = my_genes,
+                           vlnplot_prefix = "vln_",
+                           featureplot_prefix = "feat_")
+
 # With identity parameter (includes in filename)
 seurat_violin_feature_plots(my.seurat, features = c("PECAM1", "CDH5"), ident = "cell.type")
 }
