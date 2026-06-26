@@ -1,4 +1,4 @@
-## Function -- MakeAnnotationFromGTF_EnsDbStyle
+## Function -- make_annotation_from_gtf_EnsDbStyle
 #' Generate EnsDb-style GRanges from a GTF file, optionally with seqinfo from .fai
 #'
 #' @param gtf_file Path to GTF file (supports .gtf or .gtf.gz)
@@ -7,9 +7,9 @@
 #' @return GRanges object compatible with Signac/Seurat
 #' @examples
 #' # Example usage:
-#' # gtf <- MakeAnnotationFromGTF_EnsDbStyle("path/to/genome.gtf", "hg38")
+#' # gtf <- make_annotation_from_gtf_EnsDbStyle("path/to/genome.gtf", "hg38")
 #' @export
-MakeAnnotationFromGTF_EnsDbStyle <- function(gtf_file, genome_name, fai_file = NULL) {
+make_annotation_from_gtf_EnsDbStyle <- function(gtf_file, genome_name, fai_file = NULL) {
   stopifnot(file.exists(gtf_file))
   suppressPackageStartupMessages({
     library(rtracklayer)
