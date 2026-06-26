@@ -61,13 +61,11 @@ make_annotation_from_gtf_EnsDbStyle <- function(gtf_file, genome_name, fai_file 
   names(gtf) <- range_names
 
   # Simplify elementMetadata to EnsDb-style
-  mcols(gtf) <- DataFrame(
-    tx_id        = mcols(gtf)$transcript_id,
-    gene_name    = gene_name,
-    gene_id      = gene_id,
-    gene_biotype = mcols(gtf)$gene_biotype,
-    type         = gtf$type
-  )
+  mcols(gtf)$tx_id <- mcols(gtf)$transcript_id
+  mcols(gtf)$gene_name <- gene_name
+  mcols(gtf)$gene_id <- gene_id
+  mcols(gtf)$gene_biotype <- mcols(gtf)$gene_biotype
+  mcols(gtf)$type <- gtf$type
 
   # Set genome name
   genome(gtf) <- genome_name
