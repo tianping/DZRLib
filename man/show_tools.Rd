@@ -2,10 +2,30 @@
 % Please edit documentation in R/show_tools.R
 \name{show_tools}
 \alias{show_tools}
-\title{Print a Categorized List of Available Functions in DZRLib}
+\title{DZRLib CLI Function Browser (v3.2 FINAL)}
 \usage{
-show_tools()
+show_tools(..., category = NULL, fuzzy = FALSE, silent = FALSE)
+}
+\arguments{
+\item{...}{character strings used for searching (optional)}
+
+\item{category}{optional filter: "seurat", "rna", "atac", "plotting", "utils"}
+
+\item{fuzzy}{logical; whether to enable fuzzy ranking (default FALSE)}
+
+\item{silent}{logical; if TRUE, suppress console output and return data.frame only}
+}
+\value{
+data.frame (invisible) with columns:
+func, category, match, score
 }
 \description{
-Print a Categorized List of Available Functions in DZRLib
+Non-destructive exact-match function browser with optional fuzzy ranking.
+Lists exported functions from DZRLib and supports category grouping.
+}
+\examples{
+show_tools()
+show_tools("seu")
+show_tools("qc", fuzzy = TRUE)
+show_tools(category = "seurat")
 }
