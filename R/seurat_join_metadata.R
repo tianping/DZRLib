@@ -246,17 +246,17 @@ seurat_join_metadata <- function(
     # ------------------------------------------------------------
     # 10. Summary
     # ------------------------------------------------------------
-    summary <- list(
-        join = c(by.x = by.x, by.y = by.y),
-        n_cells = nrow(meta.x),
-        n_metadata = nrow(metadata),
-        matched = matched,
-        unmatched = unmatched,
-        added_columns = cols,
-        skipped_columns = skipped
-    )
-
-    attr(seu, "join_metadata_summary") <- summary
+#    summary <- list(
+#        join = c(by.x = by.x, by.y = by.y),
+#        n_cells = nrow(meta.x),
+#        n_metadata = nrow(metadata),
+#        matched = matched,
+#        unmatched = unmatched,
+#        added_columns = cols,
+#        skipped_columns = skipped
+#    )
+#
+#    attr(seu, "join_metadata_summary") <- summary
 
     if (verbose) {
 
