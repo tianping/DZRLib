@@ -20,6 +20,14 @@
 #' @param sex_ratio_threshold Numeric; threshold for male/female expression ratio.
 #'   Samples with ratio > threshold are classified as male, < 1/threshold as female.
 #'   Default: 2
+#' @param scatter_width Numeric; width of scatter plot in inches. Default: 5
+#' @param scatter_height Numeric; height of scatter plot in inches. Default: 5
+#' @param heatmap_width Numeric; width of heatmap in inches. If NULL, automatically
+#'   calculated based on number of samples. Default: NULL
+#' @param heatmap_height Numeric; height of heatmap in inches. If NULL, automatically
+#'   calculated based on number of genes. Default: NULL
+#' @param heatmap_cell_size Numeric; base size of each cell in inches. Only used when
+#'   heatmap_width/height are NULL. Default: 0.3
 #' @param output_dir Character string; directory to save output files. If NULL,
 #'   no files are saved. Default: NULL
 #' @param verbose Logical; whether to print progress messages. Default: TRUE
@@ -56,9 +64,51 @@ seurat_decide_sex <- function(
   heatmap_scale_by_gene = TRUE,
   scatter_log = TRUE,
   sex_ratio_threshold = 2,
+  scatter_width = 5,
+  scatter_height = 5,
+  heatmap_width = NULL,
+  heatmap_height = NULL,
+  heatmap_cell_size = 0.3,
   output_dir = NULL,
   verbose = TRUE
 ) {
+  
+  # ==================== Helper Functions ====================
+  
+  # Auto-calculate heatmap dimensions based on data
+  auto_calculate_heatmap_dimensions <- function(n_genes, n_samples, cell_size = 0.3) {
+    # Minimum and maximum bounds
+    min_width <- 6
+    min_height <- 6
+    max_width <- 20
+    max_height <- 16
+    
+    # Calculate based on data
+    # Width depends on number of samples (columns)
+    # Height depends on number of genes (rows)
+    width <- max(min_width, min(max_width, n_samples * cell_size + 3))
+    height <- max(min_height, min(max_height, n_genes * cell_size + 2))
+    
+    # If there are very few genes/samples, ensure reasonable size
+    if (n_genes <= 2) height <- min_height
+    if (n_samples <= 2) width <- min_width
+    
+    # Aspect ratio constraints: avoid extreme shapes
+    aspect_ratio <- height / width
+    if (aspect_ratio > 3) {
+      # Too tall: limit height
+      height <- min(height, width * 2.5)
+    } else if (aspect_ratio < 0.4) {
+      # Too wide: limit width
+      width <- min(width, height * 2.5)
+    }
+    
+    # Round to one decimal place
+    width <- round(width, 1)
+    height <- round(height, 1)
+    
+    return(list(width = width, height = height))
+  }
   
   # ==================== Input Validation ====================
   
@@ -269,7 +319,7 @@ seurat_decide_sex <- function(
     aes(x = MaleAvg, y = FemaleAvg, color = PredictedSex, label = Sample)
   ) +
     geom_point(size = 4, alpha = 0.8) +
-    geom_text(vjust = -0.8, size = 3, show.legend = FALSE) +
+    geom_text(vjust = -0.8, size = 3, show.legend = FALSE, check_overlap = TRUE) +
     scale_color_manual(values = sex_colors) +
     labs(
       title = "Sex Prediction Based on Marker Gene Expression",
@@ -319,6 +369,28 @@ seurat_decide_sex <- function(
     heatmap_title <- "CPM of Sex Marker Genes"
   }
   
+  # Auto-calculate heatmap dimensions if not specified
+  n_genes <- nrow(heatmap_data)
+  n_samples <- ncol(heatmap_data)
+  
+  if (is.null(heatmap_width) || is.null(heatmap_height)) {
+    auto_dims <- auto_calculate_heatmap_dimensions(
+      n_genes = n_genes,
+      n_samples = n_samples,
+      cell_size = heatmap_cell_size
+    )
+    
+    if (is.null(heatmap_width)) {
+      heatmap_width <- auto_dims$width
+      if (verbose) message("Auto-calculated heatmap width: ", heatmap_width, " inches")
+    }
+    
+    if (is.null(heatmap_height)) {
+      heatmap_height <- auto_dims$height
+      if (verbose) message("Auto-calculated heatmap height: ", heatmap_height, " inches")
+    }
+  }
+  
   # Create annotation for samples
   annotation_df <- data.frame(
     PredictedSex = predicted_sex
@@ -366,20 +438,20 @@ seurat_decide_sex <- function(
     # Save marker CPM matrix
     write.csv(marker_cpm, file = file.path(output_dir, "marker_gene_cpm.csv"))
     
-    # Save scatter plot
+    # Save scatter plot with user-specified dimensions
     ggsave(
       filename = file.path(output_dir, "sex_prediction_scatter.pdf"),
       plot = scatter_plot,
-      width = 10,
-      height = 8
+      width = scatter_width,
+      height = scatter_height
     )
     
-    # Save heatmap
+    # Save heatmap with user-specified or auto-calculated dimensions
     ggsave(
       filename = file.path(output_dir, "sex_prediction_heatmap.pdf"),
       plot = heatmap_grob,
-      width = 10,
-      height = 8
+      width = heatmap_width,
+      height = heatmap_height
     )
     
     # Save sex prediction summary
@@ -389,10 +461,17 @@ seurat_decide_sex <- function(
     cat("Threshold (ratio):", sex_ratio_threshold, "\n")
     cat("Male markers:", paste(male_markers_avail, collapse = ", "), "\n")
     cat("Female markers:", paste(female_markers_avail, collapse = ", "), "\n\n")
+    cat("Number of samples:", length(unique_samples), "\n")
+    cat("Number of marker genes:", n_genes, "\n\n")
     cat("Sex prediction counts:\n")
     print(table(predicted_sex))
     cat("\n\nDetailed predictions:\n")
     print(metadata)
+    if (is.null(heatmap_width) || is.null(heatmap_height)) {
+      cat("\n\nHeatmap dimensions (auto-calculated):\n")
+      cat("Width:", heatmap_width, "inches\n")
+      cat("Height:", heatmap_height, "inches\n")
+    }
     sink()
     
     if (verbose) message("All outputs saved successfully")
@@ -405,6 +484,11 @@ seurat_decide_sex <- function(
     pseudo_bulk_cpm = marker_cpm,
     scatter_plot = scatter_plot,
     heatmap = heatmap_grob,
-    predicted_sex = predicted_sex
+    predicted_sex = predicted_sex,
+    plot_dimensions = list(
+      scatter = c(width = scatter_width, height = scatter_height),
+      heatmap = c(width = heatmap_width, height = heatmap_height)
+    )
   ))
 }
+

@@ -15,6 +15,11 @@ seurat_decide_sex(
   heatmap_scale_by_gene = TRUE,
   scatter_log = TRUE,
   sex_ratio_threshold = 2,
+  scatter_width = 5,
+  scatter_height = 5,
+  heatmap_width = NULL,
+  heatmap_height = NULL,
+  heatmap_cell_size = 0.3,
   output_dir = NULL,
   verbose = TRUE
 )
@@ -46,6 +51,19 @@ Default: TRUE}
 \item{sex_ratio_threshold}{Numeric; threshold for male/female expression ratio.
 Samples with ratio > threshold are classified as male, < 1/threshold as female.
 Default: 2}
+
+\item{scatter_width}{Numeric; width of scatter plot in inches. Default: 5}
+
+\item{scatter_height}{Numeric; height of scatter plot in inches. Default: 5}
+
+\item{heatmap_width}{Numeric; width of heatmap in inches. If NULL, automatically
+calculated based on number of samples. Default: NULL}
+
+\item{heatmap_height}{Numeric; height of heatmap in inches. If NULL, automatically
+calculated based on number of genes. Default: NULL}
+
+\item{heatmap_cell_size}{Numeric; base size of each cell in inches. Only used when
+heatmap_width/height are NULL. Default: 0.3}
 
 \item{output_dir}{Character string; directory to save output files. If NULL,
 no files are saved. Default: NULL}
