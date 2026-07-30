@@ -1,15 +1,16 @@
-#' Plot Contingency Distribution with Support for Seurat Objects, Data.frames, and Tables
+#' Plot Contingency Distribution with Custom Palettes and Multilevel Ordering
 #'
 #' @description
 #' This function generates proportion and/or count barplots from a \code{Seurat} object, 
 #' a \code{data.frame}, or a \code{table}. It supports advanced nested metadata sorting, 
-#' manual level ordering, and automatic descriptive file naming.
+#' manual level ordering, custom color palettes, automatic descriptive file naming,
+#' and multi-panel combined layout via \code{patchwork}.
 #' All external calls are explicitly namespaced to prevent function masking.
 #'
 #' @param data A \code{Seurat} object, a \code{data.frame}, or a \code{table}.
 #' @param x_var Character. The column/metadata name for the X-axis (groups). Required for \code{Seurat} and \code{data.frame} inputs. Optional for \code{table}.
 #' @param fill_var Character. The column/metadata name for the fill color (categories). Required for \code{Seurat} and \code{data.frame} inputs. Optional for \code{table}.
-#' @param plot_type Character. One of \code{"both"} (default), \code{"proportion"}, or \code{"count"}.
+#' @param plot_type Character. One of \code{"merge"} (default), \code{"both"}, \code{"proportion"}, or \code{"count"}.
 #' @param position Character. Bar positioning: \code{"stack"} (default) or \code{"dodge"}.
 #' @param x_order Character vector. Custom explicit order for X-axis levels. Elements omitted here will be filtered out with a warning. Works for all input types.
 #' @param fill_order Character vector. Custom explicit order for fill levels. Elements omitted here will be filtered out with a warning. Works for all input types.
@@ -17,6 +18,7 @@
 #'   \code{"none"} (default), \code{"Total"} (total counts), \code{"Prop"} (group proportion), 
 #'   or a character vector of one or more metadata/column names in \code{data} to perform multilevel nested sorting (e.g., \code{c("Region", "BioRep")}).
 #' @param decreasing Logical. Used when \code{x_sort_by} is active. Controls sorting direction. Default is \code{FALSE} (ascending).
+#' @param palette Character vector. Custom colors for the fill categories. Can be a named vector mapping categories to colors (e.g., \code{c("A" = "red", "B" = "blue")}) or an unnamed vector of colors. If \code{NULL}, default colors are used.
 #' @param x_text_angle Numeric. Angle of X-axis text labels. Default is \code{45}.
 #' @param file_format Character. Output file extension, e.g., \code{"pdf"} (default), \code{"png"}, \code{"jpeg"}.
 #' @param width Numeric. Width of the output plot in inches. If \code{NULL}, automatically calculated.
@@ -30,24 +32,27 @@
 #' @importFrom rlang .data
 #'
 #' @examples
-#' # Example: Using a Seurat Object directly with multilevel sorting (ascending order)
+#' # Example: Using a Seurat Object directly with multilevel sorting and custom colors
+#' my_palette <- c("Excitatory" = "#3182bd", "Inhibitory" = "#31a354", "Astro" = "#9e9ac8")
 #' plot_contingency_distribution(
 #'   data = merged,
 #'   x_var = "FinalName",
 #'   fill_var = "predicted.cell_subclass",
 #'   x_sort_by = c("Region", "BioRep"),
-#'   decreasing = FALSE
+#'   decreasing = FALSE,
+#'   palette = my_palette
 #' )
 plot_contingency_distribution <- function(
     data,
     x_var = NULL,
     fill_var = NULL,
-    plot_type = c("both", "proportion", "count"),
+    plot_type = c("merge", "both", "proportion", "count"),
     position = c("stack", "dodge"),
     x_order = NULL,
     fill_order = NULL,
     x_sort_by = "none",
     decreasing = FALSE,
+    palette = NULL,
     x_text_angle = 45,
     file_format = "pdf",
     width = NULL,
@@ -265,7 +270,7 @@ plot_contingency_distribution <- function(
     width <- 3 + (num_x_groups * factor)
   }
   if (is.null(height)) {
-    height <- 5
+    height <- if (plot_type %in% c("merge", "both")) 8 else 5
   }
   
   if (!dir.exists(out_dir)) {
@@ -288,10 +293,17 @@ plot_contingency_distribution <- function(
   lbl_x <- guessed_x
   lbl_fill <- guessed_fill
   
-  # 8. Core Plotting Logic
+  # 8. Define Custom Palette Scale
+  fill_scale <- if (!is.null(palette)) {
+    ggplot2::scale_fill_manual(values = palette)
+  } else {
+    ggplot2::scale_fill_discrete()
+  }
+  
+  # 9. Core Plotting Logic
   
   # --- Plot 1: Proportion Plot ---
-  if (plot_type %in% c("both", "proportion")) {
+  if (plot_type %in% c("merge", "both", "proportion")) {
     if (position == "dodge") {
       p1 <- ggplot2::ggplot(plot_df_prop, ggplot2::aes(x = .data[[internal_x]], y = .data$Prop, fill = .data[[internal_fill]])) +
         ggplot2::geom_bar(stat = "identity", position = ggplot2::position_dodge(preserve = "single")) +
@@ -302,17 +314,42 @@ plot_contingency_distribution <- function(
         ggplot2::scale_y_continuous(labels = scales::percent_format())
     }
     
-    p1 <- p1 + base_theme + ggplot2::labs(title = "Proportion Distribution", x = lbl_x, y = "Proportion", fill = lbl_fill)
-    ggplot2::ggsave(file.path(out_dir, paste0(file_prefix, "_proportion.barplot.", file_format)), plot = p1, width = width, height = height, dpi = 300)
+    p1 <- p1 + base_theme + fill_scale + ggplot2::labs(title = "Proportion Distribution", x = lbl_x, y = "Proportion", fill = lbl_fill)
+    
+    if (plot_type == "proportion") {
+      ggplot2::ggsave(file.path(out_dir, paste0(file_prefix, "_proportion.barplot.", file_format)), plot = p1, width = width, height = height, dpi = 300)
+    }
   }
   
   # --- Plot 2: Count Plot ---
-  if (plot_type %in% c("both", "count")) {
+  if (plot_type %in% c("merge", "both", "count")) {
     p2 <- ggplot2::ggplot(plot_df, ggplot2::aes(x = .data[[internal_x]], fill = .data[[internal_fill]]))
     bar_pos <- if (position == "dodge") ggplot2::position_dodge(preserve = "single") else "stack"
     p2 <- p2 + ggplot2::geom_bar(ggplot2::aes(weight = .data[[internal_weight]]), position = bar_pos)
     
-    p2 <- p2 + base_theme + ggplot2::labs(title = "Count Distribution", x = lbl_x, y = "Cell Count", fill = lbl_fill)
+    p2 <- p2 + base_theme + fill_scale + ggplot2::labs(title = "Count Distribution", x = lbl_x, y = "Cell Count", fill = lbl_fill)
+    
+    if (plot_type == "count") {
+      ggplot2::ggsave(file.path(out_dir, paste0(file_prefix, "_count.barplot.", file_format)), plot = p2, width = width, height = height, dpi = 300)
+    }
+  }
+  
+  # --- Plot 3: Combined / Merged Plot Options ---
+  if (plot_type == "merge") {
+    # Hide X-axis elements for the top plot (count plot) to share X-axis with the bottom plot
+    p2_top <- p2 + ggplot2::theme(
+      axis.text.x = ggplot2::element_blank(),
+      axis.ticks.x = ggplot2::element_blank(),
+      axis.title.x = ggplot2::element_blank()
+    )
+    
+    # Combine plots vertically: Count on top, Proportion on bottom
+    p_merged <- (p2_top / p1) + patchwork::plot_layout(guides = "collect")
+    
+    ggplot2::ggsave(file.path(out_dir, paste0(file_prefix, "_merged.barplot.", file_format)), plot = p_merged, width = width, height = height, dpi = 300)
+    
+  } else if (plot_type == "both") {
+    ggplot2::ggsave(file.path(out_dir, paste0(file_prefix, "_proportion.barplot.", file_format)), plot = p1, width = width, height = height, dpi = 300)
     ggplot2::ggsave(file.path(out_dir, paste0(file_prefix, "_count.barplot.", file_format)), plot = p2, width = width, height = height, dpi = 300)
   }
   
@@ -323,4 +360,3 @@ plot_contingency_distribution <- function(
 `%||%` <- function(a, b) {
   if (!is.null(a)) a else b
 }
-

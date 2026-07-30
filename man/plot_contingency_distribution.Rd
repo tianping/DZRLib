@@ -2,18 +2,19 @@
 % Please edit documentation in R/plot_contingency_distribution.R
 \name{plot_contingency_distribution}
 \alias{plot_contingency_distribution}
-\title{Plot Contingency Distribution with Support for Seurat Objects, Data.frames, and Tables}
+\title{Plot Contingency Distribution with Custom Palettes and Multilevel Ordering}
 \usage{
 plot_contingency_distribution(
   data,
   x_var = NULL,
   fill_var = NULL,
-  plot_type = c("both", "proportion", "count"),
+  plot_type = c("merge", "both", "proportion", "count"),
   position = c("stack", "dodge"),
   x_order = NULL,
   fill_order = NULL,
   x_sort_by = "none",
   decreasing = FALSE,
+  palette = NULL,
   x_text_angle = 45,
   file_format = "pdf",
   width = NULL,
@@ -29,7 +30,7 @@ plot_contingency_distribution(
 
 \item{fill_var}{Character. The column/metadata name for the fill color (categories). Required for \code{Seurat} and \code{data.frame} inputs. Optional for \code{table}.}
 
-\item{plot_type}{Character. One of \code{"both"} (default), \code{"proportion"}, or \code{"count"}.}
+\item{plot_type}{Character. One of \code{"merge"} (default), \code{"both"}, \code{"proportion"}, or \code{"count"}.}
 
 \item{position}{Character. Bar positioning: \code{"stack"} (default) or \code{"dodge"}.}
 
@@ -42,6 +43,8 @@ plot_contingency_distribution(
 or a character vector of one or more metadata/column names in \code{data} to perform multilevel nested sorting (e.g., \code{c("Region", "BioRep")}).}
 
 \item{decreasing}{Logical. Used when \code{x_sort_by} is active. Controls sorting direction. Default is \code{FALSE} (ascending).}
+
+\item{palette}{Character vector. Custom colors for the fill categories. Can be a named vector mapping categories to colors (e.g., \code{c("A" = "red", "B" = "blue")}) or an unnamed vector of colors. If \code{NULL}, default colors are used.}
 
 \item{x_text_angle}{Numeric. Angle of X-axis text labels. Default is \code{45}.}
 
@@ -61,16 +64,19 @@ Invisible \code{NULL}. Plots are saved directly to disk.
 \description{
 This function generates proportion and/or count barplots from a \code{Seurat} object,
 a \code{data.frame}, or a \code{table}. It supports advanced nested metadata sorting,
-manual level ordering, and automatic descriptive file naming.
+manual level ordering, custom color palettes, automatic descriptive file naming,
+and multi-panel combined layout via \code{patchwork}.
 All external calls are explicitly namespaced to prevent function masking.
 }
 \examples{
-# Example: Using a Seurat Object directly with multilevel sorting (ascending order)
+# Example: Using a Seurat Object directly with multilevel sorting and custom colors
+my_palette <- c("Excitatory" = "#3182bd", "Inhibitory" = "#31a354", "Astro" = "#9e9ac8")
 plot_contingency_distribution(
   data = merged,
   x_var = "FinalName",
   fill_var = "predicted.cell_subclass",
   x_sort_by = c("Region", "BioRep"),
-  decreasing = FALSE
+  decreasing = FALSE,
+  palette = my_palette
 )
 }
