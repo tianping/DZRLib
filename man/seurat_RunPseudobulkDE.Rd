@@ -42,12 +42,13 @@ seurat_RunPseudobulkDE(
 \item{min_cells}{Integer, default 2. Minimum sample/pseudobulk cell count required per comparison group.}
 }
 \value{
-A named list of data.frames containing DE analysis results for each comparison.
+A named list of data.frames containing DE analysis results for each comparison, and optionally the aggregated count table under \code{"_aggregated_counts"}.
 }
 \description{
 Performs pairwise differential expression (DE) analysis on pseudobulk objects
 or raw single-cell Seurat objects. Supports both stratified/nested comparisons
 (e.g., comparing conditions within each cell type) and global comparisons.
+Automatically exports aggregated count tables if AggregateExpression is run.
 }
 \examples{
 \dontrun{
@@ -61,8 +62,7 @@ de_results <- seurat_RunPseudobulkDE(
   findmarkers_args = list(test.use = "DESeq2"),
   out_dir = "./results_by_celltype"
 )
-# Access specific comparison result from list
-head(de_results[["BEC1___Back_vs_Ear"]])
+
 # Scenario 2: Input pre-aggregated pseudobulk object for global comparison
 de_global <- seurat_RunPseudobulkDE(
   object = my.exp.pseudo,
@@ -71,6 +71,7 @@ de_global <- seurat_RunPseudobulkDE(
   findmarkers_args = list(test.use = "DESeq2"),
   out_dir = "./results_global"
 )
+
 # Scenario 3: Subset specific cell types and comparison pairs with incremental update
 de_results_updated <- seurat_RunPseudobulkDE(
   object = my.exp.pseudo,
@@ -81,5 +82,8 @@ de_results_updated <- seurat_RunPseudobulkDE(
   existing_results = de_results,
   out_dir = "./results_updated"
 )
+
+# Access specific comparison result from list
+head(de_results[["BEC1___Back_vs_Ear"]])
 }
 }

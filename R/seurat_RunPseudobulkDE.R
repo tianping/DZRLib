@@ -3,6 +3,7 @@
 #' Performs pairwise differential expression (DE) analysis on pseudobulk objects
 #' or raw single-cell Seurat objects. Supports both stratified/nested comparisons
 #' (e.g., comparing conditions within each cell type) and global comparisons.
+#' Automatically exports aggregated count tables if AggregateExpression is run.
 #'
 #' @param object A Seurat object (either a raw single-cell object or a pre-aggregated pseudobulk object).
 #' @param compare_col Character. Metadata column name used for pairwise comparisons (e.g., "origin_site" or "stim").
@@ -16,7 +17,7 @@
 #' @param existing_results List, optional. An existing result list to incrementally update/append new results.
 #' @param min_cells Integer, default 2. Minimum sample/pseudobulk cell count required per comparison group.
 #'
-#' @return A named list of data.frames containing DE analysis results for each comparison.
+#' @return A named list of data.frames containing DE analysis results for each comparison, and optionally the aggregated count table under \code{"_aggregated_counts"}.
 #' @export
 #'
 #' @examples
@@ -31,10 +32,7 @@
 #'   findmarkers_args = list(test.use = "DESeq2"),
 #'   out_dir = "./results_by_celltype"
 #' )
-
-#' # Access specific comparison result from list
-#' head(de_results[["BEC1___Back_vs_Ear"]])
-
+#'
 #' # Scenario 2: Input pre-aggregated pseudobulk object for global comparison
 #' de_global <- seurat_RunPseudobulkDE(
 #'   object = my.exp.pseudo,
@@ -43,7 +41,7 @@
 #'   findmarkers_args = list(test.use = "DESeq2"),
 #'   out_dir = "./results_global"
 #' )
-
+#'
 #' # Scenario 3: Subset specific cell types and comparison pairs with incremental update
 #' de_results_updated <- seurat_RunPseudobulkDE(
 #'   object = my.exp.pseudo,
@@ -54,6 +52,9 @@
 #'   existing_results = de_results,
 #'   out_dir = "./results_updated"
 #' )
+#'
+#' # Access specific comparison result from list
+#' head(de_results[["BEC1___Back_vs_Ear"]])
 #' }
 seurat_RunPseudobulkDE <- function(object,
                                    compare_col,
@@ -68,15 +69,36 @@ seurat_RunPseudobulkDE <- function(object,
                                    min_cells = 2) {
   
   # ---------------------------------------------------------------------------
-  # 1. Pseudobulk aggregation (if group_by is provided)
+  # 1. Pseudobulk aggregation & Save Aggregated Counts (if group_by is given)
   # ---------------------------------------------------------------------------
   seurat_obj <- object
+  aggregated_counts <- NULL
   
   if (!is.null(group_by)) {
     message(">>> Running AggregateExpression to build Pseudobulk object...")
-    agg_params <- c(list(object = seurat_obj, group.by = group_by, return.seurat = TRUE), agg_args)
-    agg_params <- agg_params[!duplicated(names(agg_params))]
-    seurat_obj <- do.call(Seurat::AggregateExpression, agg_params)
+    
+    # Extract raw matrix output for table export
+    agg_params_mat <- c(list(object = seurat_obj, group.by = group_by, return.seurat = FALSE), agg_args)
+    agg_params_mat <- agg_params_mat[!duplicated(names(agg_params_mat))]
+    aggregated_counts <- do.call(Seurat::AggregateExpression, agg_params_mat)
+    
+    # Create aggregated Seurat object
+    agg_params_obj <- c(list(object = seurat_obj, group.by = group_by, return.seurat = TRUE), agg_args)
+    agg_params_obj <- agg_params_obj[!duplicated(names(agg_params_obj))]
+    seurat_obj <- do.call(Seurat::AggregateExpression, agg_params_obj)
+    
+    # Write aggregated counts to disk
+    if (!is.null(out_dir)) {
+      if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
+      
+      assay_name <- names(aggregated_counts)[1]
+      cnt_mat <- aggregated_counts[[assay_name]]
+      cnt_df <- as.data.frame(as.matrix(cnt_mat))
+      cnt_df <- tibble::rownames_to_column(cnt_df, var = "gene")
+      
+      utils::write.csv(cnt_df, file = file.path(out_dir, "aggregated_pseudobulk_counts.csv"), row.names = FALSE)
+      message(">>> Saved aggregated count matrix to: ", file.path(out_dir, "aggregated_pseudobulk_counts.csv"))
+    }
   }
   
   if (!is.null(out_dir) && !dir.exists(out_dir)) {
@@ -84,6 +106,10 @@ seurat_RunPseudobulkDE <- function(object,
   }
   
   results_list <- existing_results
+  if (!is.null(aggregated_counts)) {
+    results_list[["_aggregated_counts"]] <- aggregated_counts
+  }
+  
   all_combined_df <- list()
   
   # ---------------------------------------------------------------------------
